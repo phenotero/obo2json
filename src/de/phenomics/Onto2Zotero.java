@@ -26,17 +26,17 @@ public class Onto2Zotero {
 	 */
 	public static void main(String[] args) {
 
-		// init json document
-		JSONArray arr = new JSONArray();
 		// get the obo files form cmd-line
 		int c = 0;
 		for (String oboFile : args) {
+			// init json document
+			JSONArray arr = new JSONArray();
 			System.out.println("parse ontology: " + oboFile);
 			Ontology ontology = OntologyUtil.parseOntology(oboFile);
 			for (Term t : ontology) {
 				JSONObject termAsZotero = new JSONObject();
-				termAsZotero.put("id", t.getIDAsString());
-				termAsZotero.put("type", "article-journal");
+				termAsZotero.put("id", "http://purl.obolibrary.org/obo/" + t.getIDAsString().replaceAll(":", "_"));
+				termAsZotero.put("type", "entry-dictionary");
 				termAsZotero.put("title", t.getIDAsString() + " : " + t.getName());
 				termAsZotero.put("container-title", t.getIDAsString());
 				JSONArray authorArray = new JSONArray();
@@ -74,25 +74,23 @@ public class Onto2Zotero {
 				termAsZotero.put("author", authorArray);
 				arr.add(termAsZotero);
 			}
+			String json = arr.toJSONString();
+			String jsonWithNl = json.replaceAll(",", ",\n");
+			try {
 
+				BufferedWriter out = new BufferedWriter(new FileWriter(oboFile + ".json"));
+				out.write(json);
+				out.close();
+
+				BufferedWriter out2 = new BufferedWriter(new FileWriter(oboFile + "2.json"));
+				out2.write(jsonWithNl);
+				out2.close();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			System.out.println("done");
 		}
-
-		String json = arr.toJSONString();
-		String jsonWithNl = json.replaceAll(",", ",\n");
-		try {
-
-			BufferedWriter out = new BufferedWriter(new FileWriter("phenotypes1.json"));
-			out.write(json);
-			out.close();
-
-			BufferedWriter out2 = new BufferedWriter(new FileWriter("phenotypes2.json"));
-			out2.write(jsonWithNl);
-			out2.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println("done");
 
 	}
 
