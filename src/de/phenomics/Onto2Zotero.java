@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 
 import ontologizer.go.Ontology;
 import ontologizer.go.Term;
+import sonumina.math.graph.SlimDirectedGraphView;
 import util.OntologyUtil;
 
 /**
@@ -26,27 +27,45 @@ public class Onto2Zotero {
 	 */
 	public static void main(String[] args) {
 
-		// get the obo files form cmd-line
-		int c = 0;
+		// process ontologies from commandline
 		for (String oboFile : args) {
+
+			System.out.println("processing ontology: " + oboFile);
+
+			boolean addDefinition = true;
+			if (oboFile.toLowerCase().contains("mondo")) {
+				addDefinition = false;
+			}
+
 			// init json document
-			JSONArray arr = new JSONArray();
-			System.out.println("parse ontology: " + oboFile);
+			JSONArray jsonArrayTerms = new JSONArray();
 			Ontology ontology = OntologyUtil.parseOntology(oboFile);
-			for (Term t : ontology) {
+			SlimDirectedGraphView<Term> ontologySlim = ontology.getSlimGraphView();
+			HashSet<Term> rootChildren = new HashSet<Term>(ontologySlim.getChildren(ontology.getRootTerm()));
+
+			for (Term term : ontology) {
+
+				// ignore root and direct subclasses of root
+				if (ontology.isRootTerm(term.getID()))
+					continue;
+
+				if (rootChildren.contains(term))
+					continue;
+
 				JSONObject termAsZotero = new JSONObject();
-				termAsZotero.put("id", "http://purl.obolibrary.org/obo/" + t.getIDAsString().replaceAll(":", "_"));
+				termAsZotero.put("id", "http://purl.obolibrary.org/obo/" + term.getIDAsString().replaceAll(":", "_"));
 				termAsZotero.put("type", "entry-dictionary");
-				termAsZotero.put("title", t.getIDAsString() + " : " + t.getName());
-				termAsZotero.put("container-title", t.getIDAsString());
+				termAsZotero.put("title", term.getIDAsString() + " : " + term.getName());
+				termAsZotero.put("container-title", term.getIDAsString());
+
 				JSONArray authorArray = new JSONArray();
 				boolean hasDefOrSyn = false;
 
-				if (t.getSynonyms() != null && t.getSynonyms().length > 0) {
+				if (term.getSynonyms() != null && term.getSynonyms().length > 0) {
 					hasDefOrSyn = true;
 
 					HashSet<String> allSyns = new HashSet<>();
-					for (String syn : t.getSynonyms()) {
+					for (String syn : term.getSynonyms()) {
 						allSyns.add(syn.toLowerCase());
 					}
 					allSyns = removeContained(allSyns);
@@ -57,39 +76,37 @@ public class Onto2Zotero {
 						authorArray.add(authorObj);
 					}
 				}
-				if (t.getDefinition() != null) {
-					hasDefOrSyn = true;
-					JSONObject authorObj = new JSONObject();
-					authorObj.put("family", t.getDefinition());
-					authorArray.add(authorObj);
+				if (addDefinition) {
+					if (term.getDefinition() != null) {
+						hasDefOrSyn = true;
+						JSONObject authorObj = new JSONObject();
+						authorObj.put("family", term.getDefinition());
+						authorArray.add(authorObj);
+					}
 				}
-
 				// put at least one author
 				if (!hasDefOrSyn) {
 					JSONObject authorObj = new JSONObject();
-					authorObj.put("family", t.getName());
+					authorObj.put("family", term.getName());
 					authorArray.add(authorObj);
 				}
 
 				termAsZotero.put("author", authorArray);
-				arr.add(termAsZotero);
+				jsonArrayTerms.add(termAsZotero);
 			}
-			String json = arr.toJSONString();
-			String jsonWithNl = json.replaceAll(",", ",\n");
+
+			String jsonFileContent = jsonArrayTerms.toJSONString();
 			try {
 
 				BufferedWriter out = new BufferedWriter(new FileWriter(oboFile + ".json"));
-				out.write(json);
+				out.write(jsonFileContent);
 				out.close();
-
-				BufferedWriter out2 = new BufferedWriter(new FileWriter(oboFile + "2.json"));
-				out2.write(jsonWithNl);
-				out2.close();
 
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			System.out.println("done");
+
+			System.out.println("... finished");
 		}
 
 	}
