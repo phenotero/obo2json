@@ -55,7 +55,7 @@ public class Onto2Zotero {
 				JSONObject termAsZotero = new JSONObject();
 				termAsZotero.put("id", "http://purl.obolibrary.org/obo/" + term.getIDAsString().replaceAll(":", "_"));
 				termAsZotero.put("type", "entry-dictionary");
-				termAsZotero.put("title", term.getIDAsString() + " : " + term.getName());
+				termAsZotero.put("title", term.getName());
 				termAsZotero.put("container-title", term.getIDAsString());
 
 				JSONArray authorArray = new JSONArray();
