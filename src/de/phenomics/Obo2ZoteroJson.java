@@ -20,7 +20,7 @@ import util.OntologyUtil;
  * @author Sebastian Köhler (dr.sebastian.koehler@gmail.com)
  *
  */
-public class Onto2Zotero {
+public class Obo2ZoteroJson {
 
 	/**
 	 * @param args
@@ -56,9 +56,6 @@ public class Onto2Zotero {
 				termAsZotero.put("id", "http://purl.obolibrary.org/obo/" + term.getIDAsString().replaceAll(":", "_"));
 				termAsZotero.put("type", "entry-dictionary");
 				termAsZotero.put("title", term.getName());
-				if (term.getName() == null || term.getName().length() < 1) {
-					System.out.println("OHHH " + term);
-				}
 				termAsZotero.put("container-title", term.getIDAsString());
 
 				JSONArray authorArray = new JSONArray();
