@@ -1,10 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>phenotero</groupId>
 	<artifactId>phenotero</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
+
+	<repositories>
+		<repository>
+			<id>compbio</id>
+			<url>http://compbio.charite.de/tl_files/maven</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 
@@ -14,7 +22,11 @@
 			<artifactId>json-simple</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-
+		<dependency>
+			<groupId>ontologizer</groupId>
+			<artifactId>ontologizer</artifactId>
+			<version>0.0.3-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -48,7 +60,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>de.phenomics.Onto2Zotero</mainClass>
+							<mainClass>de.phenomics.Obo2ZoteroJson</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

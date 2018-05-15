@@ -11,10 +11,12 @@ import java.util.HashSet;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import ontologizer.go.OBOParser;
+import ontologizer.go.OBOParserException;
 import ontologizer.go.Ontology;
 import ontologizer.go.Term;
+import ontologizer.go.TermContainer;
 import sonumina.math.graph.SlimDirectedGraphView;
-import util.OntologyUtil;
 
 /**
  * @author Sebastian Köhler (dr.sebastian.koehler@gmail.com)
@@ -39,7 +41,7 @@ public class Obo2ZoteroJson {
 
 			// init json document
 			JSONArray jsonArrayTerms = new JSONArray();
-			Ontology ontology = OntologyUtil.parseOntology(oboFile);
+			Ontology ontology = parseOntology(oboFile);
 			SlimDirectedGraphView<Term> ontologySlim = ontology.getSlimGraphView();
 			HashSet<Term> rootChildren = new HashSet<Term>(ontologySlim.getChildren(ontology.getRootTerm()));
 
@@ -109,6 +111,28 @@ public class Obo2ZoteroJson {
 			System.out.println("... finished");
 		}
 
+	}
+
+	/**
+	 * @param oboFile
+	 * @return
+	 */
+	private static Ontology parseOntology(String oboFile) {
+		OBOParser oboParser = null;
+		oboParser = new OBOParser(oboFile, OBOParser.PARSE_DEFINITIONS | OBOParser.PARSE_XREFS);
+
+		try {
+			String parseInfo = oboParser.doParse();
+			System.out.println(parseInfo);
+
+		} catch (IOException | OBOParserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// get the complete hpo
+		TermContainer termContainer = new TermContainer(oboParser.getTermMap(), oboParser.getFormatVersion(),
+				oboParser.getDataVersion());
+		return Ontology.create(termContainer);
 	}
 
 	/**
