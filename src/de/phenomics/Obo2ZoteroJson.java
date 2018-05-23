@@ -63,7 +63,7 @@ public class Obo2ZoteroJson {
 				JSONArray authorArray = new JSONArray();
 				boolean hasDefOrSyn = false;
 
-				if (term.getSynonyms() != null && term.getSynonyms().length > 0) {
+				if (term.getSynonyms() != null && term.getSynonyms().size() > 0) {
 					hasDefOrSyn = true;
 
 					HashSet<String> allSyns = new HashSet<>();
