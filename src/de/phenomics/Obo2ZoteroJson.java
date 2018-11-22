@@ -11,11 +11,11 @@ import java.util.HashSet;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import ontologizer.go.OBOParser;
-import ontologizer.go.OBOParserException;
-import ontologizer.go.Ontology;
-import ontologizer.go.Term;
-import ontologizer.go.TermContainer;
+import ontologizer.ontology.OBOParser;
+import ontologizer.ontology.OBOParserException;
+import ontologizer.ontology.Ontology;
+import ontologizer.ontology.Term;
+import ontologizer.ontology.TermContainer;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 /**
@@ -119,7 +119,7 @@ public class Obo2ZoteroJson {
 	 */
 	private static Ontology parseOntology(String oboFile) {
 		OBOParser oboParser = null;
-		oboParser = new OBOParser(oboFile, OBOParser.PARSE_DEFINITIONS | OBOParser.PARSE_XREFS);
+		oboParser = new OBOParser(oboFile);
 
 		try {
 			String parseInfo = oboParser.doParse();
