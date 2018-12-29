@@ -130,8 +130,7 @@ public class Obo2ZoteroJson {
 			e.printStackTrace();
 		}
 		// get the complete hpo
-		TermContainer termContainer = new TermContainer(oboParser.getTermMap(), oboParser.getFormatVersion(),
-				oboParser.getDataVersion());
+		TermContainer termContainer = new TermContainer(oboParser);
 		return Ontology.create(termContainer);
 	}
 
